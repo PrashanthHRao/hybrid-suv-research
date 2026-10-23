@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irish Family Hybrid SUV Research Dashboard</title>
+<style>
+:root{--bg:#0a0a0f;--card:#141420;--card2:#1a1a2e;--border:#2a2a3e;--text:#e4e4ef;--text2:#a0a0b8;--accent:#4f8cff;--accent2:#22c55e;--warn:#f59e0b;--danger:#ef4444;--purple:#a855f7;--gradient:linear-gradient(135deg,#4f8cff,#a855f7);--radius:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:var(--accent)}
+.container{max-width:1400px;margin:0 auto;padding:0 24px}
+.nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;gap:8px;padding:10px 24px;overflow-x:auto;max-width:1400px;margin:0 auto}
+.nav-btn{padding:8px 16px;border:none;background:0 0;color:var(--text2);border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;font-family:inherit}
+.nav-btn:hover{background:var(--card2);color:var(--text)}.nav-btn.active{background:var(--accent);color:#fff}
+.nav-title{font-weight:700;font-size:14px;padding-right:16px;color:var(--text);white-space:nowrap}
+.page{display:none;padding:32px 0;animation:fadeIn .3s}.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+.card h2{font-size:20px;margin-bottom:12px;color:var(--accent)}.card h3{font-size:16px;margin-bottom:8px}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase}
+.badge-green{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.badge-blue{background:rgba(79,140,255,.15);color:#60a5fa;border:1px solid rgba(79,140,255,.3)}
+.badge-yellow{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.badge-red{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--text2);font-weight:600;text-transform:uppercase;font-size:11px;background:var(--card)}
+tr:hover td{background:rgba(79,140,255,.04)}.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius)}
+.calc-row{display:flex;gap:12px;align-items:end;margin-bottom:12px;flex-wrap:wrap}
+.calc-field{display:flex;flex-direction:column;gap:4px}.calc-field label{font-size:12px;color:var(--text2);text-transform:uppercase}
+.calc-field input,.calc-field select{background:var(--card2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:14px;font-family:inherit}
+.calc-field input:focus,.calc-field select:focus{outline:0;border-color:var(--accent)}
+.calc-result{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:12px}
+.calc-result .amount{font-size:28px;font-weight:700;color:var(--accent2)}.calc-result .label{font-size:12px;color:var(--text2);text-transform:uppercase}
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:12px}
+.calc-stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.calc-stat .val{font-size:20px;font-weight:700}.calc-stat .lbl{font-size:11px;color:var(--text2);text-transform:uppercase}
+.highlight{border-left:3px solid var(--accent);padding:12px 16px;background:rgba(79,140,255,.05);border-radius:0 8px 8px 0;margin:12px 0}
+.highlight-green{border-left-color:var(--accent2);background:rgba(34,197,94,.05)}
+.highlight-red{border-left-color:var(--danger);background:rgba(239,68,68,.05)}
+.search-box{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.search-box input,.search-box select{background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:14px;font-family:inherit;flex:1;min-width:150px}
+.hero{text-align:center;padding:48px 24px 32px}.hero h1{font-size:clamp(24px,4vw,36px);background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.hero p{color:var(--text2);font-size:16px;max-width:600px;margin:0 auto}
+.listing{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.listing-info h4{font-size:15px;margin-bottom:2px}.listing-info p{font-size:12px;color:var(--text2)}
+.listing-price{font-size:20px;font-weight:700;color:var(--accent2);white-space:nowrap}
+.spec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.spec-item{padding:8px 12px;background:var(--card2);border-radius:8px;font-size:13px}
+.spec-item .spec-label{font-size:10px;color:var(--text2);text-transform:uppercase;display:block}
+@media(max-width:768px){.card-grid{grid-template-columns:1fr}.calc-row{flex-direction:column}.calc-field{width:100%}.listing{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="nav-inner">
+<span class="nav-title">🚗 Hybrid SUV Research</span>
+<button class="nav-btn active" onclick="showPage('summary')">Summary</button>
+<button class="nav-btn" onclick="showPage('compare')">Compare</button>
+<button class="nav-btn" onclick="showPage('finder')">Finder</button>
+<button class="nav-btn" onclick="showPage('interior')">Interior</button>
+<button class="nav-btn" onclick="showPage('family')">Family</button>
+<button class="nav-btn" onclick="showPage('reliability')">Reliability</button>
+<button class="nav-btn" onclick="showPage('finance')">Finance</button>
+<button class="nav-btn" onclick="showPage('tco')">TCO</button>
+<button class="nav-btn" onclick="showPage('listings')">Listings</button>
+<button class="nav-btn" onclick="showPage('buying')">Guide</button>
+</div></nav>
+<div class="container">
+<div class="page active" id="page-summary">
+<div class="hero"><h1>Irish Family Full-Hybrid SUV Research</h1>
+<p>7 full-hybrid family SUVs — budget €26k–€28k, family of three with two child seats</p>
+<p style="margin-top:8px"><span class="badge badge-blue">23 Oct 2026</span> <span class="badge badge-purple">Fuel: €1.72/L</span></p></div>
+
+<div class="card"><h2>🏆 Top 3 Recommendations</h2>
+<div class="highlight highlight-green"><strong>#1: Kia Sportage HEV GT-Line (2022–2023)</strong><br>Best balance of space, features, warranty &amp; value. 7yr transferable warranty, heated steering/seats. Target: <strong>€25,500–€26,500</strong></div>
+<div class="highlight"><strong>#2: Hyundai Tucson HEV Elite (2022–2023)</strong><br>Sibling to Sportage, larger boot (540L). 5yr warranty. Target: <strong>€24,000–€26,000</strong></div>
+<div class="highlight"><strong>#3: Toyota RAV4 HEV Design (2021–2022)</strong><br>Best reliability, largest boot (580L). No heated steering, no wireless CarPlay. Target: <strong>€25,000–€26,000</strong></div>
+<div class="highlight highlight-red"><strong>Avoid for families:</strong> Toyota C-HR (332L boot — double buggy won't fit), Corolla Cross (no heated steering), Nissan Qashqai e-POWER (higher fuel consumption)</div></div>
+
+<div class="card"><h2>📊 Weighted Scorecard</h2>
+<p style="font-size:13px;color:var(--text2);margin-bottom:12px">Reliability 25% | Space 20% | Value 15% | Tech 12% | Comfort 8% | TCO 8% | Safety 7% | Warranty 5%</p>
+<table><thead><tr><th>Rank</th><th>Model</th><th>Score</th><th>Rel</th><th>Space</th><th>Value</th><th>Tech</th><th>Comfort</th><th>TCO</th><th>Safety</th><th>Warr</th></tr></thead>
+<tbody id="score-table"></tbody></table></div>
+
+<div class="card"><h2>⚠️ Key Findings</h2>
+<div class="spec-grid">
+<div class="spec-item"><span class="spec-label">Wireless CarPlay</span>Only on 2024+ facelift models. Most used examples have wired only.</div>
+<div class="spec-item"><span class="spec-label">Heated Steering</span>Sportage GT-Line+ and Tucson Elite+ only. No Toyota model offers it.</div>
+<div class="spec-item"><span class="spec-label">Double Buggy</span>RAV4(580L) > Tucson(540L) > Sportage(483L) > Corolla Cross(453L) > Qashqai(434L) > Kona(419L) > C-HR(332L)</div>
+<div class="spec-item"><span class="spec-label">Two Child Seats</span>Sportage, Tucson, RAV4 fit two ISOFIX seats comfortably. C-HR/Kona are tight.</div>
+<div class="spec-item"><span class="spec-label">Reliability</span>Toyota RAV4/Corolla Cross/C-HR (9.0–9.3/10). Kia/Hyundai (8.3–8.5/10).</div>
+<div class="spec-item"><span class="spec-label">Nissan e-POWER</span>Petrol engine NEVER drives the wheels — pure electric drive. Smooth but less efficient (7.5–8.5 L/100km).</div>
+<div class="spec-item"><span class="spec-label">Warranty</span>Kia: 7yr/100k mi transferable. Toyota hybrid battery: 8yr/160k km transferable.</div>
+<div class="spec-item"><span class="spec-label">Fuel Economy</span>Toyota e-CVT leads (6.5–7.2 L/100km). Nissan e-POWER worst (7.5–8.5).</div>
+</div></div>
+
+<div class="card"><h2>🎯 Priority-by-Priority Winner</h2>
+<table><thead><tr><th>#</th><th>Priority</th><th>Winner</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Reliability</td><td>Toyota RAV4</td><td>TNGA + e-CVT proven over millions of vehicles</td></tr>
+<tr><td>2</td><td>Rear Seats</td><td>Kia Sportage</td><td>Widest rear bench, heated rear seats on GT-Line</td></tr>
+<tr><td>3</td><td>Boot (Buggy)</td><td>Toyota RAV4</td><td>580L — handles most folded double buggies</td></tr>
+<tr><td>4</td><td>Value</td><td>Kia Sportage</td><td>7yr transferable warranty + competitive pricing</td></tr>
+<tr><td>5</td><td>Wireless CarPlay</td><td>2024+ facelifts</td><td>Must specify facelift year for any brand</td></tr>
+<tr><td>6</td><td>Interior</td><td>Hyundai Tucson Elite</td><td>Premium materials, ambient lighting, dual screens</td></tr>
+<tr><td>7</td><td>Heated Stew</td><td>Sportage / Tucson</td><td>Only Korean brands offer heated steering on HEV</td></tr>
+<tr><td>8</td><td>Keyless</td><td>All models</td><td>Standard across all 7</td></tr>
+<tr><td>9</td><td>Safety</td><td>All 5★</td><td>Minor differences — all excellent</td></tr>
+<tr><td>10</td><td>Warranty</td><td>Kia Sportage</td><td>7yr/100k mi transferable vs 5yr for others</td></tr>
+<tr><td>11</td><td>Fuel Economy</td><td>Corolla Cross</td><td>Toyota e-CVT: 6.5–7.2 L/100km</td></tr>
+<tr><td>12</td><td>TCO</td><td>Kia Sportage</td><td>Warranty + fuel + service balance</td></tr>
+<tr><td>13</td><td>Resale</td><td>Toyota RAV4</td><td>~52% of new price after 3 years</td></tr>
+</tbody></table></div></div>
+<div class="page" id="page-compare">
+<h1 style="margin-bottom:20px">📊 Model Comparison</h1>
+<div class="card"><h2>Specifications</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Spec</th><th>Sportage</th><th>Tucson</th><th>Corolla Cross</th><th>C-HR</th><th>Qashqai</th><th>Kona</th><th>RAV4</th></tr></thead>
+<tbody>
+<tr><td><strong>Engine</strong></td><td>1.6 T-GDI+e</td><td>1.6 T-GDI+e</td><td>1.8 Dyn+2e</td><td>2.0 Dyn+2e</td><td>1.5 gen+140kW</td><td>1.6 MPI+e</td><td>2.5 Dyn+2e</td></tr>
+<tr><td><strong>Power</strong></td><td>169kW (227bhp)</td><td>169kW (227bhp)</td><td>114-140kW</td><td>160kW (216bhp)</td><td>140kW (190bhp)</td><td>104-134kW</td><td>163kW (218bhp)</td></tr>
+<tr><td><strong>Transmission</strong></td><td>6-speed auto</td><td>6-speed auto</td><td>e-CVT</td><td>e-CVT</td><td>Single-speed</td><td>6-speed DCT</td><td>e-CVT</td></tr>
+<tr><td><strong>Drive</strong></td><td>FWD/AWD opt</td><td>FWD/AWD opt</td><td>FWD/E-Four opt</td><td>E-Four AWD</td><td>FWD/e-4ORCE</td><td>FWD</td><td>FWD/E-Four opt</td></tr>
+<tr><td><strong>Boot</strong></td><td>483L</td><td><strong>540L</strong></td><td>453L</td><td>332L</td><td>434L</td><td>419L</td><td><strong>580L</strong></td></tr>
+<tr><td><strong>Boot Folded</strong></td><td>1,567L</td><td>1,620L</td><td>1,480L</td><td>1,164L</td><td>1,400L</td><td>1,290L</td><td>1,636L</td></tr>
+<tr><td><strong>Length</strong></td><td>4,515mm</td><td>4,500mm</td><td>4,460mm</td><td>4,400mm</td><td>4,425mm</td><td>4,205mm</td><td>4,600mm</td></tr>
+<tr><td><strong>Fuel Tank</strong></td><td>52L</td><td>50.7L</td><td>43L</td><td>43L</td><td>45L</td><td>43L</td><td>55L</td></tr>
+<tr><td><strong>MPG (real)</strong></td><td>36-40</td><td>36-40</td><td>39-43</td><td>39-43</td><td>33-37</td><td>38-43</td><td>36-40</td></tr>
+<tr><td><strong>CO₂</strong></td><td>104-112</td><td>104-112</td><td>99-105</td><td>104</td><td>112-118</td><td>99-106</td><td>107-114</td></tr>
+</tbody></table></div></div>
+
+<div class="card"><h2>Features</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Feature</th><th>Sportage</th><th>Tucson</th><th>Corolla Cross</th><th>C-HR</th><th>Qashqai</th><th>Kona</th><th>RAV4</th></tr></thead>
+<tbody>
+<tr><td>Screen</td><td>8″–12.3″</td><td>10.25″</td><td>8″–10.5″</td><td>9″–12.3″</td><td>9″–12.3″</td><td>10.25″</td><td>8″–9″</td></tr>
+<tr><td>Cluster</td><td>10.25″ (GT+)</td><td>10.25″ (Com+)</td><td>7″ LCD</td><td>Analogue</td><td>12.3″ (N-C+)</td><td>10.25″ (24+)</td><td>4.2″ disp</td></tr>
+<tr><td>Wireless CP</td><td><span class="badge badge-yellow">24+ facelift</span></td><td><span class="badge badge-yellow">24+ facelift</span></td><td><span class="badge badge-yellow">24+ facelift</span></td><td><span class="badge badge-yellow">24+ facelift</span></td><td><span class="badge badge-yellow">24+</span></td><td><span class="badge badge-yellow">24+ only</span></td><td><span class="badge badge-red">25+ only</span></td></tr>
+<tr><td>Heated Stew</td><td>✓ GT-Line+</td><td>✓ Elite+</td><td><span class="badge badge-red">N/A</span></td><td><span class="badge badge-red">N/A</span></td><td>✓ N-Connecta+</td><td>✓ Elite (24+)</td><td><span class="badge badge-red">N/A</span></td></tr>
+<tr><td>Heated Seats</td><td>✓ Comfort+</td><td>✓ Comfort+</td><td>✓ Design+</td><td>✓ Dynamic+</td><td>✓ N-Connecta</td><td>✓ Comfort</td><td>✓ Design+</td></tr>
+<tr><td>Keyless Start</td><td>All</td><td>All</td><td>Design+</td><td>All</td><td>All</td><td>All</td><td>All</td></tr>
+<tr><td>Power Tailgate</td><td>GT-Line+</td><td>Elite+</td><td><span class="badge badge-red">N/A</span></td><td>Dynamic+</td><td>N-Connecta+</td><td>Elite+</td><td>Design+</td></tr>
+</tbody></table></div></div>
+
+<div class="card"><h2>Warranty &amp; Ownership</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Item</th><th>Sportage</th><th>Tucson</th><th>Corolla Cross</th><th>C-HR</th><th>Qashqai</th><th>Kona</th><th>RAV4</th></tr></thead>
+<tbody>
+<tr><td>Warranty</td><td><span class="badge badge-green">7yr/100k mi</span></td><td>5yr/unlimited</td><td>5yr (new only)</td><td>5yr (new only)</td><td>5yr/unlimited</td><td>5yr/unlimited</td><td>5yr (new only)</td></tr>
+<tr><td>Transferable</td><td>✓ Yes</td><td>✓ Yes</td><td>✗ No</td><td>✗ No</td><td>✓ Yes</td><td>✓ Yes</td><td>✗ No</td></tr>
+<tr><td>Battery</td><td>7yr/100k mi</td><td>5yr/unlimited</td><td><span class="badge badge-green">8yr/160k km</span></td><td><span class="badge badge-green">8yr/160k km</span></td><td>5yr/unlimited</td><td>5yr/unlimited</td><td><span class="badge badge-green">8yr/160k km</span></td></tr>
+<tr><td>Service</td><td>€300-450</td><td>€300-450</td><td>€250-400</td><td>€250-400</td><td>€300-400</td><td>€250-350</td><td>€250-400</td></tr>
+</tbody></table></div></div>
+
+<div class="card"><h2>Euro NCAP</h2>
+<table><thead><tr><th>Model</th><th>Rating</th><th>Adult</th><th>Child</th><th>VRU</th><th>SA</th><th>Year</th></tr></thead>
+<tbody>
+<tr><td>Sportage</td><td><span class="badge badge-green">5★</span></td><td>90%</td><td>88%</td><td>74%</td><td>84%</td><td>2021</td></tr>
+<tr><td>Tucson</td><td><span class="badge badge-green">5★</span></td><td>91%</td><td>88%</td><td>74%</td><td>86%</td><td>2021</td></tr>
+<tr><td>Corolla Cross</td><td><span class="badge badge-green">5★</span></td><td>89%</td><td>87%</td><td>73%</td><td>81%</td><td>2022</td></tr>
+<tr><td>C-HR</td><td><span class="badge badge-green">5★</span></td><td>91%</td><td>87%</td><td>74%</td><td>85%</td><td>2023</td></tr>
+<tr><td>Qashqai</td><td><span class="badge badge-green">5★</span></td><td>90%</td><td>86%</td><td>76%</td><td>88%</td><td>2021</td></tr>
+<tr><td>Kona</td><td><span class="badge badge-green">5★</span></td><td>92%</td><td>89%</td><td>81%</td><td>88%</td><td>2024</td></tr>
+<tr><td>RAV4</td><td><span class="badge badge-green">5★</span></td><td>88%</td><td>80%</td><td>76%</td><td>85%</td><td>2019</td></tr>
+</tbody></table></div></div>
+<div class="page" id="page-finder">
+<h1 style="margin-bottom:20px">🔍 Vehicle Finder</h1>
+<div class="search-box">
+<input type="text" id="finder-search" placeholder="Search model, trim, location..." oninput="filterListings()">
+<select id="finder-model" onchange="filterListings()"><option value="">All Models</option><option>Kia Sportage</option><option>Hyundai Tucson</option><option>Toyota Corolla Cross</option><option>Toyota C-HR</option><option>Nissan Qashqai</option><option>Hyundai Kona</option><option>Toyota RAV4</option></select>
+<select id="finder-year" onchange="filterListings()"><option value="">All Years</option><option>2024</option><option>2023</option><option>2022</option><option>2021</option><option>2020</option></select>
+<input type="number" id="finder-maxprice" placeholder="Max Price €" oninput="filterListings()">
+<select id="finder-sort" onchange="filterListings()"><option value="price-asc">Price: Low → High</option><option value="price-desc">Price: High → Low</option><option value="year-desc">Year: Newest</option><option value="km-asc">Mileage: Lowest</option></select>
+</div>
+<div id="listings-container"></div></div>
+
+<div class="page" id="page-interior">
+<h1 style="margin-bottom:20px">🖥️ Interior &amp; Technology</h1>
+<div class="card"><h2>Interior Rankings</h2>
+<table><thead><tr><th>Rank</th><th>Model</th><th>Quality</th><th>Rear Space</th><th>Build</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Tucson Elite</td><td><span class="badge badge-green">Excellent</span></td><td>Very Good</td><td>High</td><td>Best materials, ambient lighting</td></tr>
+<tr><td>2</td><td>Sportage GT-Line</td><td><span class="badge badge-green">Excellent</span></td><td>Very Good</td><td>High</td><td>Premium feel, panoramic roof</td></tr>
+<tr><td>3</td><td>Qashqai N-Connecta+</td><td><span class="badge badge-blue">Good</span></td><td>Excellent</td><td>Good</td><td>Best rear legroom</td></tr>
+<tr><td>4</td><td>C-HR Dynamic+</td><td><span class="badge badge-blue">Good</span></td><td>Fair</td><td>Good</td><td>Stylish but rear space compromised</td></tr>
+<tr><td>5</td><td>RAV4 Design</td><td><span class="badge badge-yellow">Functional</span></td><td>Excellent</td><td>Good</td><td>Utilitarian, lots of space</td></tr>
+<tr><td>6</td><td>Corolla Cross</td><td><span class="badge badge-yellow">Functional</span></td><td>Good</td><td>Adequate</td><td>Soft plastics, basic interior</td></tr>
+<tr><td>7</td><td>Kona Elite</td><td><span class="badge badge-yellow">Functional</span></td><td>Fair</td><td>Adequate</td><td>Smaller cabin</td></tr>
+</tbody></table></div>
+
+<div class="card"><h2>Infotainment Deep Dive</h2>
+<div class="card-grid">
+<div class="card" style="margin:0"><h3>Sportage (GT-Line)</h3><div class="spec-grid"><div class="spec-item"><span class="spec-label">Screen</span>12.3″</div><div class="spec-item"><span class="spec-label">Cluster</span>10.25″ digital</div><div class="spec-item"><span class="spec-label">CarPlay</span>Wired (24+: wireless)</div><div class="spec-item"><span class="spec-label">Audio</span>8-speaker</div><div class="spec-item"><span class="spec-label">Wireless Charge</span>✓</div></div></div>
+<div class="card" style="margin:0"><h3>Tucson (Elite)</h3><div class="spec-grid"><div class="spec-item"><span class="spec-label">Screen</span>10.25″ (12.3″ 24+)</div><div class="spec-item"><span class="spec-label">Cluster</span>10.25″ digital</div><div class="spec-item"><span class="spec-label">CarPlay</span>Wired (24+: wireless)</div><div class="spec-item"><span class="spec-label">Wireless Charge</span>✓ Elite+</div></div></div>
+<div class="card" style="margin:0"><h3>RAV4 (Design)</h3><div class="spec-grid"><div class="spec-item"><span class="spec-label">Screen</span>8″ or 9″</div><div class="spec-item"><span class="spec-label">Cluster</span>Analogue + 4.2″</div><div class="spec-item"><span class="spec-label">CarPlay</span>Wired (25+: wireless)</div><div class="spec-item"><span class="spec-label">Audio</span>JBL available</div></div><p style="margin-top:8px;font-size:12px;color:var(--text2)">Toyota's infotainment is notably slow. 2025 facelift fixes this.</p></div>
+<div class="card" style="margin:0"><h3>Corolla Cross</h3><div class="spec-grid"><div class="spec-item"><span class="spec-label">Screen</span>8″ (10.5″ 24+)</div><div class="spec-item"><span class="spec-label">Cluster</span>Analogue + 7″</div><div class="spec-item"><span class="spec-label">CarPlay</span>Wired (24+: wireless)</div><div class="spec-item"><span class="spec-label">Wireless Charge</span>✗</div></div></div>
+<div class="card" style="margin:0"><h3>C-HR (Dynamic+)</h3><div class="spec-grid"><div class="spec-item"><span class="spec-label">Screen</span>9″ (12.3″ 24+)</div><div class="spec-item"><span class="spec-label">CarPlay</span>Wired (24+: wireless)</div><div class="spec-item"><span class="spec-label">Audio</span>JBL 9-speaker</div></div></div>
+<div class="card" style="margin:0"><h3>Qashqai (N-Connecta+)</h3><div class="spec-grid"><div class="spec-item"><span class="spec-label">Screen</span>12.3″</div><div class="spec-item"><span class="spec-label">Cluster</span>12.3″ digital</div><div class="spec-item"><span class="spec-label">CarPlay</span>Wired (24+: wireless)</div></div></div>
+<div class="card" style="margin:0"><h3>Kona (2024 3rd gen)</h3><div class="spec-grid"><div class="spec-item"><span class="spec-label">Screen</span>10.25″</div><div class="spec-item"><span class="spec-label">CarPlay</span><span class="badge badge-green">Wireless</span></div></div><p style="margin-top:8px;font-size:12px;color:var(--text2)">3rd gen major upgrade. 2024+ only.</p></div>
+</div></div>
+
+<div class="card"><h2>⚠️ Wireless CarPlay Reality</h2>
+<div class="highlight highlight-red"><strong>Most used examples in €26k–€28k range have WIRED CarPlay only.</strong><br>Wireless CarPlay requires 2024+ facelift (Kia/Hyundai/Toyota) or 3rd gen Kona. For your budget, target specific facelift models or accept wired connections.</div></div></div>
+<div class="page" id="page-family">
+<h1 style="margin-bottom:20px">👶 Family Practicality</h1>
+<div class="card"><h2>Child Seat &amp; Rear Seat</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Criteria</th><th>Sportage</th><th>Tucson</th><th>Corolla Cross</th><th>C-HR</th><th>Qashqai</th><th>Kona</th><th>RAV4</th></tr></thead>
+<tbody>
+<tr><td>ISOFIX</td><td>2 (outer)</td><td>2</td><td>2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+<tr><td>Two Child Seats</td><td><span class="badge badge-green">Easy</span></td><td><span class="badge badge-green">Easy</span></td><td><span class="badge badge-blue">Possible</span></td><td><span class="badge badge-yellow">Tight</span></td><td><span class="badge badge-green">Easy</span></td><td><span class="badge badge-yellow">Tight</span></td><td><span class="badge badge-green">Easy</span></td></tr>
+<tr><td>Rear Legroom</td><td>Very Good</td><td>Very Good</td><td>Good</td><td>Fair</td><td>Excellent</td><td>Fair</td><td>Excellent</td></tr>
+<tr><td>Rear Headroom</td><td>Very Good</td><td>Good</td><td>Good</td><td>Poor</td><td>Very Good</td><td>Fair</td><td>Excellent</td></tr>
+<tr><td>Rear Heated Seats</td><td>✓ GT-Line</td><td>✓ Elite</td><td>✗</td><td>✗</td><td>✗</td><td>✗</td><td>✗</td></tr>
+<tr><td>Rear Climate</td><td>All</td><td>Comfort+</td><td>Design+</td><td>Dynamic+</td><td>N-Connecta+</td><td>Elite+</td><td>Design+</td></tr>
+</tbody></table></div></div>
+
+<div class="card"><h2>Double Buggy Boot Fit</h2>
+<table>
+<thead><tr><th>Model</th><th>Boot</th><th>Fit</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>RAV4</td><td><strong>580L</strong></td><td><span class="badge badge-green">Excellent</span></td><td>Handles most double buggies folded</td></tr>
+<tr><td>Tucson</td><td><strong>540L</strong></td><td><span class="badge badge-green">Very Good</span></td><td>Wide opening, flat floor</td></tr>
+<tr><td>Sportage</td><td>483L</td><td><span class="badge badge-blue">Good</span></td><td>Most compact doubles fit</td></tr>
+<tr><td>Corolla Cross</td><td>453L</td><td><span class="badge badge-yellow">Fair</span></td><td>May need rear seat fold</td></tr>
+<tr><td>Qashqai</td><td>434L</td><td><span class="badge badge-yellow">Fair</span></td><td>Taller boot helps</td></tr>
+<tr><td>Kona</td><td>419L</td><td><span class="badge badge-yellow">Fair</span></td><td>Compact — tight for doubles</td></tr>
+<tr><td>C-HR</td><td>332L</td><td><span class="badge badge-red">Poor</span></td><td>Narrow opening — not suitable</td></tr>
+</tbody></table></div></div>
+
+<div class="page" id="page-reliability">
+<h1 style="margin-bottom:20px">🔧 Reliability</h1>
+<div class="card"><h2>Reliability Rankings</h2>
+<table><thead><tr><th>Rank</th><th>Model</th><th>Score</th><th>System</th><th>Issues</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>RAV4</td><td><strong>9.3/10</strong></td><td>2.5L+2e-motors, e-CVT</td><td>None significant</td></tr>
+<tr><td>2</td><td>Corolla Cross</td><td><strong>9.2/10</strong></td><td>1.8L+2e-motors, e-CVT</td><td>None</td></tr>
+<tr><td>3</td><td>C-HR</td><td><strong>9.0/10</strong></td><td>2.0L+2e-motors, e-CVT</td><td>Infotainment UI</td></tr>
+<tr><td>4</td><td>Sportage</td><td><strong>8.5/10</strong></td><td>1.6T+e-motor, 6spd</td><td>Screen freezes (early)</td></tr>
+<tr><td>5</td><td>Tucson</td><td><strong>8.3/10</strong></td><td>1.6T+e-motor, 6spd</td><td>Trim squeak</td></tr>
+<tr><td>6</td><td>Kona</td><td><strong>8.2/10</strong></td><td>1.6+e-motor, DCT</td><td>DCT jerkiness (early)</td></tr>
+<tr><td>7</td><td>Qashqai e-POWER</td><td><strong>7.8/10</strong></td><td>1.5L gen + 140kW motor</td><td>Generator noise, fuel use</td></tr>
+</tbody></table></div>
+
+<div class="card"><h2>Hybrid System Deep Dive</h2>
+<div class="card-grid">
+<div class="card" style="margin:0"><h3>Toyota e-CVT (RAV4, Corolla Cross, C-HR)</h3><p style="font-size:13px;color:var(--text2)">Parallel hybrid with planetary gearset. Electric only at low speed, engine at cruise, both on acceleration. No traditional gearbox — essentially maintenance-free. 20+ years proven, battery failure rate &lt;0.1%. 8yr/160k km warranty.</p></div>
+<div class="card" style="margin:0"><h3>Kia/Hyundai 6-Speed (Sportage, Tucson)</h3><p style="font-size:13px;color:var(--text2)">1.6L turbo + 6-speed auto + 44.9kW e-motor. More traditional feel, can cruise electrically. Same engine as ICE versions. 7yr warranty (Kia), 5yr (Hyundai).</p></div>
+<div class="card" style="margin:0"><h3>Nissan e-POWER (Qashqai)</h3><p style="font-size:13px;color:var(--text2)">Petrol engine NEVER drives wheels — acts only as generator for 140kW electric motor. Feels like EV. Simpler drivetrain but less efficient on motorways (7.5-8.5 L/100km). Generator noise noticeable on hard acceleration.</p></div>
+</div></div>
+
+<div class="card"><h2>Depreciation</h2>
+<table><thead><tr><th>Model</th><th>New €</th><th>Yr 1</th><th>Yr 2</th><th>Yr 3</th><th>Yr 5</th></tr></thead>
+<tbody>
+<tr><td>Sportage</td><td>~38k</td><td>75%</td><td>62%</td><td>45%</td><td>33%</td></tr>
+<tr><td>Tucson</td><td>~37k</td><td>73%</td><td>60%</td><td>42%</td><td>31%</td></tr>
+<tr><td>Corolla Cross</td><td>~33k</td><td>78%</td><td>65%</td><td>50%</td><td>37%</td></tr>
+<tr><td>C-HR</td><td>~35k</td><td>72%</td><td>58%</td><td>45%</td><td>33%</td></tr>
+<tr><td>Qashqai</td><td>~36k</td><td>70%</td><td>55%</td><td>40%</td><td>29%</td></tr>
+<tr><td>Kona</td><td>~31k</td><td>72%</td><td>58%</td><td>40%</td><td>29%</td></tr>
+<tr><td>RAV4</td><td>~40k</td><td>80%</td><td>67%</td><td>52%</td><td>39%</td></tr>
+</tbody></table></div></div>
+<div class="page" id="page-finance">
+<h1 style="margin-bottom:20px">💰 Finance Calculator</h1>
+<div class="card"><h2>Monthly Payment</h2>
+<div class="calc-row">
+<div class="calc-field"><label>Car Price (€)</label><input type="number" id="fin-price" value="27000" oninput="calcFinance()"></div>
+<div class="calc-field"><label>Deposit (€)</label><input type="number" id="fin-deposit" value="5000" oninput="calcFinance()"></div>
+<div class="calc-field"><label>APR (%)</label><input type="number" id="fin-apr" value="7.5" step="0.1" oninput="calcFinance()"></div>
+<div class="calc-field"><label>Term</label><select id="fin-term" onchange="calcFinance()"><option value="24">24 mo</option><option value="36">36 mo</option><option value="48" selected>48 mo</option><option value="60">60 mo</option><option value="72">72 mo</option></select></div>
+</div>
+<div id="finance-results"></div></div>
+
+<div class="card"><h2>Irish Finance Providers</h2>
+<table><thead><tr><th>Provider</th><th>APR</th><th>Terms</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Bank of Ireland</td><td>5.49–9.99%</td><td>12-72 mo</td><td>Lowest APR</td></tr>
+<tr><td>AIB</td><td>5.9–9.9%</td><td>12-72 mo</td><td>Competitive</td></tr>
+<tr><td>Permira</td><td>5.9–10.9%</td><td>12-72 mo</td><td>Used by dealers</td></tr>
+<tr><td>Ulster Bank</td><td>6.49–9.49%</td><td>12-60 mo</td><td>Mid-range</td></tr>
+</tbody></table>
+<div class="highlight" style="margin-top:12px">⚠️ APRs vary by credit score. Used car rates typically 1-2% higher than new. Shop around.</div></div>
+
+<div class="card"><h2>Budget: €650/month Target</h2><div id="budget-analysis"></div></div></div>
+
+<div class="page" id="page-tco">
+<h1 style="margin-bottom:20px">📈 TCO Calculator</h1>
+<div class="card"><h2>3-Year TCO</h2>
+<div class="calc-row">
+<div class="calc-field"><label>Model</label><select id="tco-model" onchange="updateTCO()"><option value="sportage">Kia Sportage HEV</option><option value="tucson">Hyundai Tucson HEV</option><option value="corollacross">Corolla Cross HEV</option><option value="chr">C-HR HEV</option><option value="qashqai">Qashqai e-POWER</option><option value="kona">Kona HEV</option><option value="rav4">RAV4 HEV</option></select></div>
+<div class="calc-field"><label>Price (€)</label><input type="number" id="tco-price" value="27000" oninput="updateTCO()"></div>
+<div class="calc-field"><label>Yearly km</label><input type="number" id="tco-mileage" value="15000" oninput="updateTCO()"></div>
+<div class="calc-field"><label>Fuel €</label><input type="number" id="tco-fuel" value="1.72" step="0.01" oninput="updateTCO()"></div>
+</div>
+<div id="tco-results"></div></div>
+<div class="card"><h2>TCO Comparison (15,000 km/yr)</h2><div id="tco-comparison"></div></div></div>
+<div class="page" id="page-listings">
+<h1 style="margin-bottom:20px">🚘 Irish Market Listings</h1>
+<p style="font-size:13px;color:var(--text2);margin-bottom:20px">Sample realistic listings based on current Irish market conditions. Always verify with dealers.</p>
+<div id="all-listings"></div></div>
+
+<div class="page" id="page-buying">
+<h1 style="margin-bottom:20px">📋 Buying Guide</h1>
+<div class="card"><h2>Step-by-Step</h2>
+<ol style="padding-left:20px;font-size:14px;line-height:2">
+<li><strong>Define priorities</strong> — Rear space > boot space > reliability > warranty</li>
+<li><strong>Shortlist 2-3 models</strong> — Sportage GT-Line, Tucson Elite, or RAV4 Design</li>
+<li><strong>Search listings</strong> — CarsIreland.ie, Carzone.ie, DoneDeal.ie</li>
+<li><strong>Verify HEV</strong> — Confirm full HEV (not MHEV/PHEV) on registration docs</li>
+<li><strong>Service history</strong> — Full dealer service history essential</li>
+<li><strong>Pre-purchase inspection</strong> — CarVertical or mechanic (€50-100)</li>
+<li><strong>Test drive</strong> — Test EV mode, hybrid transitions, infotainment</li>
+<li><strong>Warranty check</strong> — Kia 7yr transferable. Ask dealer to confirm.</li>
+<li><strong>Negotiate</strong> — Start 5-10% below asking. End-of-month is best.</li>
+<li><strong>Arrange finance</strong> — Compare multiple providers, don't accept dealer only</li>
+<li><strong>NCT</strong> — Check validity. Factor €80 cost if due soon</li>
+<li><strong>Complete purchase</strong> — V5C assignment, receipt, insurance, motor tax</li>
+</ol></div>
+
+<div class="card"><h2>🔍 Used Hybrid Checklist</h2>
+<div class="card-grid">
+<div class="card" style="margin:0"><h3>✅ Good Signs</h3><ul style="list-style:none;padding:0;font-size:13px"><li>📋 Full dealer service history</li><li>🔋 Battery health report</li><li>📝 Transferable warranty</li><li>🚗 Low mileage (&lt;15k km/yr)</li><li>⚡ Smooth transitions</li><li>🔌 No warning lights</li></ul></div>
+<div class="card" style="margin:0"><h3>⚠️ Red Flags</h3><ul style="list-style:none;padding:0;font-size:13px"><li>❌ No service history</li><li>🚨 Check engine light</li><li>🔊 Rough transitions</li><li>📉 Mileage inconsistent</li><li>💸 Price too low</li><li>🚗 Multiple owners</li><li>📋 NCT due soon</li></ul></div>
+</div></div>
+
+<div class="card"><h2>💡 Tips</h2>
+<div class="highlight highlight-green"><strong>Best Time to Buy:</strong> End of month/quarter. December/January often have better deals.</div>
+<div class="highlight"><strong>Where to Look:</strong> CarsIreland.ie (largest), Carzone.ie (good filters), DoneDeal.ie (private, cheapest), Facebook Marketplace</div>
+<div class="highlight"><strong>Negotiation:</strong> Mention competing listings. If NCT due within 3 months, negotiate €80-120 off. End-of-month is strongest.</div>
+<div class="highlight highlight-red"><strong>Avoid:</strong> MHEV (not full hybrid), no service history, cars under finance, European imports without NCT/VRT clearance</div></div>
+
+<div class="card"><h2>📊 Model-Specific Buying Advice</h2>
+<div class="card-grid">
+<div class="card" style="margin:0"><h3>Sportage GT-Line (22-23)</h3><p style="font-size:13px;color:var(--text2)"><strong>Target:</strong> €25,500-€26,500 | 30-50k km</p><p style="font-size:13px;color:var(--text2)"><strong>Check:</strong> Warranty remaining, screen function, heated steering, service history</p><div class="highlight highlight-green">Best overall pick</div></div>
+<div class="card" style="margin:0"><h3>Tucson Elite (22-23)</h3><p style="font-size:13px;color:var(--text2)"><strong>Target:</strong> €24,000-€26,000 | 30-50k km</p><p style="font-size:13px;color:var(--text2)"><strong>Check:</strong> Window regulators, heated steering, panoramic roof</p><div class="highlight">Best value to Sportage</div></div>
+<div class="card" style="margin:0"><h3>RAV4 Design (21-22)</h3><p style="font-size:13px;color:var(--text2)"><strong>Target:</strong> €25,000-€26,000 | 35-55k km</p><p style="font-size:13px;color:var(--text2)"><strong>Check:</strong> Battery health, AWD function, power tailgate, tyre wear</p><div class="highlight">Best reliability, no heated steering</div></div>
+</div></div>
+
+<div class="card"><h2>🔗 Links</h2><div class="spec-grid">
+<div class="spec-item"><span class="spec-label">Listings</span><a href="https://www.carsireland.ie" target="_blank">CarsIreland.ie ↗</a></div>
+<div class="spec-item"><span class="spec-label">Listings</span><a href="https://www.carzone.ie" target="_blank">Carzone.ie ↗</a></div>
+<div class="spec-item"><span class="spec-label">Private</span><a href="https://www.donedeal.ie/cars" target="_blank">DoneDeal.ie ↗</a></div>
+<div class="spec-item"><span class="spec-label">History</span><a href="https://www.carvertical.com/ie" target="_blank">CarVertical ↗</a></div>
+<div class="spec-item"><span class="spec-label">NCT</span><a href="https://www.nct.ie" target="_blank">NCT.ie ↗</a></div>
+<div class="spec-item"><span class="spec-label">Finance</span><a href="https://www.moneymart.ie" target="_blank">MoneyMart.ie ↗</a></div>
+</div></div></div>
+</div><!-- end container -->
+<script>
+const MODELS = [
+{id:'sportage',name:'Kia Sportage HEV',brand:'Kia',year:'2022-2023',engine:'1.6 T-GDI + e-motor',power:'227 bhp',trans:'6-speed auto',drive:'FWD/AWD',boot:483,bootDown:1567,mpg:'36-40',fuelTank:52,co2:'104-112',
+scores:{reliability:8.5,space:8.5,value:9.0,tech:8.0,comfort:8.5,tco:8.0,safety:8.7,warranty:9.5},price:{new:38000,usedMin:24000,usedMax:28000},
+features:{wirelessCP:'2024+ facelift',heatedSteer:'GT-Line+',heatedSeats:'Comfort+',keyless:true,tailgate:'GT-Line+',cluster:'10.25″ (GT-Line+)'},
+ncap:{adult:90,child:88,vru:74,sa:84},fuelUse:'7.0-7.8 L/100km',serviceCost:'€300-450',depreciation3:45},
+{id:'tucson',name:'Hyundai Tucson HEV',brand:'Hyundai',year:'2022-2023',engine:'1.6 T-GDI + e-motor',power:'227 bhp',trans:'6-speed auto',drive:'FWD/AWD',boot:540,bootDown:1620,mpg:'36-40',fuelTank:50.7,co2:'104-112',
+scores:{reliability:8.3,space:8.8,value:8.5,tech:8.5,comfort:8.5,tco:7.8,safety:8.7,warranty:8.0},price:{new:37000,usedMin:23000,usedMax:27000},
+features:{wirelessCP:'2024+ facelift',heatedSteer:'Elite+',heatedSeats:'Comfort+',keyless:true,tailgate:'Elite+',cluster:'10.25″ (Comfort+)'},
+ncap:{adult:91,child:88,vru:74,sa:86},fuelUse:'7.0-7.8 L/100km',serviceCost:'€300-450',depreciation3:42},
+{id:'corollacross',name:'Toyota Corolla Cross HEV',brand:'Toyota',year:'2022-2023',engine:'1.8 Dynamic Force + 2 e-motors',power:'151-188 bhp',trans:'e-CVT',drive:'FWD/E-Four',boot:453,bootDown:1480,mpg:'39-43',fuelTank:43,co2:'99-105',
+scores:{reliability:9.2,space:7.0,value:8.5,tech:5.5,comfort:6.0,tco:8.5,safety:8.5,warranty:7.5},price:{new:33000,usedMin:21000,usedMax:26000},
+features:{wirelessCP:'2024+ facelift',heatedSteer:'N/A',heatedSeats:'Design+',keyless:'Design+',tailgate:'N/A',cluster:'7″ LCD'},
+ncap:{adult:89,child:87,vru:73,sa:81},fuelUse:'6.5-7.2 L/100km',serviceCost:'€250-400',depreciation3:50},
+{id:'chr',name:'Toyota C-HR HEV',brand:'Toyota',year:'2023',engine:'2.0 Dynamic Force + 2 e-motors',power:'216 bhp',trans:'e-CVT',drive:'E-Four AWD',boot:332,bootDown:1164,mpg:'39-43',fuelTank:43,co2:'104',
+scores:{reliability:9.0,space:4.5,value:7.0,tech:6.5,comfort:6.5,tco:8.0,safety:8.8,warranty:7.5},price:{new:35000,usedMin:23000,usedMax:27000},
+features:{wirelessCP:'2024+ facelift',heatedSteer:'N/A',heatedSeats:'Dynamic+',keyless:true,tailgate:'Dynamic+',cluster:'Analogue'},
+ncap:{adult:91,child:87,vru:74,sa:85},fuelUse:'6.8-7.5 L/100km',serviceCost:'€250-400',depreciation3:45},
+{id:'qashqai',name:'Nissan Qashqai e-POWER',brand:'Nissan',year:'2022-2023',engine:'1.5 DIG-T gen + 140kW motor',power:'190 bhp',trans:'Single-speed',drive:'FWD/e-4ORCE',boot:434,bootDown:1400,mpg:'33-37',fuelTank:45,co2:'112-118',
+scores:{reliability:7.8,space:7.5,value:6.5,tech:8.0,comfort:7.5,tco:6.5,safety:8.7,warranty:7.5},price:{new:36000,usedMin:22000,usedMax:27000},
+features:{wirelessCP:'2024+',heatedSteer:'N-Connecta+',heatedSeats:'N-Connecta',keyless:true,tailgate:'N-Connecta+',cluster:'12.3″ (N-Connecta+)'},
+ncap:{adult:90,child:86,vru:76,sa:88},fuelUse:'7.5-8.5 L/100km',serviceCost:'€300-400',depreciation3:40},
+{id:'kona',name:'Hyundai Kona HEV',brand:'Hyundai',year:'2024',engine:'1.6 MPI + e-motor',power:'141-180 bhp',trans:'6-speed DCT',drive:'FWD',boot:419,bootDown:1290,mpg:'38-43',fuelTank:43,co2:'99-106',
+scores:{reliability:8.2,space:5.5,value:7.5,tech:7.5,comfort:6.0,tco:7.8,safety:9.0,warranty:8.0},price:{new:31000,usedMin:19000,usedMax:25000},
+features:{wirelessCP:'2024+ (3rd gen)',heatedSteer:'Elite (2024+)',heatedSeats:'Comfort',keyless:true,tailgate:'Elite+',cluster:'10.25″ (2024+)'},
+ncap:{adult:92,child:89,vru:81,sa:88},fuelUse:'6.8-7.5 L/100km',serviceCost:'€250-350',depreciation3:40},
+{id:'rav4',name:'Toyota RAV4 HEV',brand:'Toyota',year:'2021-2022',engine:'2.5 Dynamic Force + 2 e-motors',power:'218 bhp',trans:'e-CVT',drive:'FWD/E-Four',boot:580,bootDown:1636,mpg:'36-40',fuelTank:55,co2:'107-114',
+scores:{reliability:9.3,space:9.0,value:7.5,tech:5.5,comfort:7.0,tco:8.5,safety:8.5,warranty:7.5},price:{new:40000,usedMin:23000,usedMax:28000},
+features:{wirelessCP:'2025+ facelift',heatedSteer:'N/A',heatedSeats:'Design+',keyless:true,tailgate:'Design+',cluster:'4.2″ display'},
+ncap:{adult:88,child:80,vru:76,sa:85},fuelUse:'7.0-7.8 L/100km',serviceCost:'€250-400',depreciation3:52}
+];
+
+const WEIGHTS = {reliability:0.25,space:0.20,value:0.15,tech:0.12,comfort:0.08,tco:0.08,safety:0.07,warranty:0.05};
+
+const LISTINGS = [
+{model:'Kia Sportage',trim:'GT-Line HEV',year:2023,km:38000,price:26500,location:'Dublin',dealer:'Main Motor Group',notes:'1.6 HEV, AWD, 12.3″ screen, heated seats/stew, panoramic roof, full service history'},
+{model:'Kia Sportage',trim:'GT-Line HEV',year:2022,km:45000,price:25500,location:'Cork',dealer:'Motorpoint',notes:'1.6 HEV, 12.3″ screen, heated seats, leather interior, full dealer service'},
+{model:'Kia Sportage',trim:'Comfort Plus HEV',year:2023,km:32000,price:24500,location:'Galway',dealer:'Motorworld',notes:'1.6 HEV, 8″ screen, heated seats, good base spec, full service history'},
+{model:'Kia Sportage',trim:'GT-Line HEV',year:2023,km:28000,price:27000,location:'Limerick',dealer:'AA Thompson',notes:'1.6 HEV, AWD, low mileage, full spec, full service history'},
+{model:'Hyundai Tucson',trim:'Elite HEV',year:2023,km:40000,price:25500,location:'Dublin',dealer:'HIC Motor Group',notes:'1.6 HEV, AWD, 10.25″ screen, heated seats/stew, panoramic roof'},
+{model:'Hyundai Tucson',trim:'Comfort Plus HEV',year:2023,km:35000,price:24000,location:'Cork',dealer:'Centra Motor Group',notes:'1.6 HEV, good spec, heated seats, full service history'},
+{model:'Hyundai Tucson',trim:'Elite HEV',year:2022,km:52000,price:23500,location:'Galway',dealer:'Motorworld',notes:'1.6 HEV, premium spec, higher mileage, full dealer service'},
+{model:'Toyota RAV4',trim:'Design HEV AWD',year:2022,km:48000,price:25500,location:'Dublin',dealer:'Main Toyota',notes:'2.5 HEV, E-Four AWD, power tailgate, Toyota TSS, full service history'},
+{model:'Toyota RAV4',trim:'Icon HEV AWD',year:2021,km:55000,price:24500,location:'Limerick',dealer:'Toyota Centre',notes:'2.5 HEV, E-Four, JBL audio, leather, higher mileage'},
+{model:'Toyota RAV4',trim:'Design HEV',year:2022,km:42000,price:26000,location:'Cork',dealer:'Centra Toyota',notes:'2.5 HEV, well equipped, full Toyota service history'},
+{model:'Toyota Corolla Cross',trim:'Design HEV',year:2023,km:30000,price:23500,location:'Dublin',dealer:'Motorworld',notes:'1.8 HEV, Toyota TSS, no heated steering, no wireless CP'},
+{model:'Toyota Corolla Cross',trim:'Advance HEV AWD',year:2023,km:25000,price:25500,location:'Galway',dealer:'Toyota Centre',notes:'1.8 HEV, E-Four AWD, 10.5″ screen (facelift), wireless CP'},
+{model:'Toyota C-HR',trim:'Dynamic+ HEV',year:2023,km:28000,price:25000,location:'Dublin',dealer:'Main Toyota',notes:'2.0 HEV, E-Four, JBL audio, 332L boot — tight for families'},
+{model:'Toyota C-HR',trim:'Design HEV',year:2023,km:35000,price:24000,location:'Cork',dealer:'Centra Toyota',notes:'2.0 HEV, good spec, but boot too small for double buggy'},
+{model:'Nissan Qashqai',trim:'N-Connecta+ e-POWER',year:2023,km:30000,price:25000,location:'Dublin',dealer:'Main Nissan',notes:'1.5 e-POWER, 12.3″ screens, ProPILOT, higher fuel use'},
+{model:'Nissan Qashqai',trim:'Acenta+ e-POWER',year:2022,km:42000,price:23500,location:'Cork',dealer:'Nissan Cork',notes:'1.5 e-POWER, premium spec, heated steering'},
+{model:'Hyundai Kona',trim:'Elite HEV',year:2024,km:15000,price:23500,location:'Dublin',dealer:'HIC Motor Group',notes:'1.6 HEV, 3rd gen, wireless CP, low mileage, compact SUV'},
+{model:'Hyundai Kona',trim:'Comfort HEV',year:2024,km:20000,price:21500,location:'Galway',dealer:'Motorworld',notes:'1.6 HEV, 3rd gen, good value, compact size'}
+];
+
+function showPage(id) {
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+document.getElementById('page-'+id).classList.add('active');
+document.querySelectorAll('.nav-btn').forEach(b=>{if(b.textContent.toLowerCase().includes(id.substring(0,4)))b.classList.add('active')});
+}
+
+function calcWeighted(m) {
+let s=0; for(let k in WEIGHTS) s+=(m.scores[k]||0)*WEIGHTS[k]; return s;
+}
+
+function renderScoreTable() {
+let scored = MODELS.map(m=>({...m,total:calcWeighted(m)})).sort((a,b)=>b.total-a.total);
+let html='';
+scored.forEach((m,i)=>{
+let cls=i===0?'highlight-green':i<3?'':'';
+html+=`<tr><td>${i+1}</td><td><strong>${m.name}</strong></td><td><strong>${m.total.toFixed(1)}</strong></td>`;
+html+=`<td>${m.scores.reliability}</td><td>${m.scores.space}</td><td>${m.scores.value}</td><td>${m.scores.tech}</td>`;
+html+=`<td>${m.scores.comfort}</td><td>${m.scores.tco}</td><td>${m.scores.safety}</td><td>${m.scores.warranty}</td></tr>`;
+});
+document.getElementById('score-table').innerHTML=html;
+}
+
+function renderListingCard(l) {
+return `<div class="listing"><div class="listing-info"><h4>${l.year} ${l.model} ${l.trim}</h4><p>${l.km.toLocaleString()} km • ${l.location} • ${l.dealer}</p><p>${l.notes}</p></div><div class="listing-price">€${l.price.toLocaleString()}</div></div>`;
+}
+
+function renderListings() {
+document.getElementById('all-listings').innerHTML=LISTINGS.map(renderListingCard).join('');
+document.getElementById('listings-container').innerHTML=LISTINGS.map(renderListingCard).join('');
+}
+
+function filterListings() {
+let search=document.getElementById('finder-search').value.toLowerCase();
+let model=document.getElementById('finder-model').value;
+let year=document.getElementById('finder-year').value;
+let maxPrice=parseInt(document.getElementById('finder-maxprice').value)||Infinity;
+let sort=document.getElementById('finder-sort').value;
+let filtered=LISTINGS.filter(l=>{
+if(search&&!l.model.toLowerCase().includes(search)&&!l.trim.toLowerCase().includes(search)&&!l.location.toLowerCase().includes(search)&&!l.notes.toLowerCase().includes(search))return false;
+if(model&&l.model!==model)return false;
+if(year&&l.year!==parseInt(year))return false;
+if(l.price>maxPrice)return false;
+return true;
+});
+filtered.sort((a,b)=>{
+if(sort==='price-asc')return a.price-b.price;
+if(sort==='price-desc')return b.price-a.price;
+if(sort==='year-desc')return b.year-a.year;
+if(sort==='km-asc')return a.km-b.km;
+return 0;
+});
+document.getElementById('listings-container').innerHTML=filtered.length?filtered.map(renderListingCard).join(''):'<p style="color:var(--text2);padding:20px">No listings match your filters.</p>';
+}
+
+function calcFinance() {
+let price=parseFloat(document.getElementById('fin-price').value)||0;
+let deposit=parseFloat(document.getElementById('fin-deposit').value)||0;
+let apr=parseFloat(document.getElementById('fin-apr').value)||0;
+let term=parseInt(document.getElementById('fin-term').value)||48;
+let loan=price-deposit;
+let rate=apr/100/12;
+let monthly=rate>0?(loan*rate*Math.pow(1+rate,term))/(Math.pow(1+rate,term)-1):loan/term;
+let total=monthly*term+deposit;
+let interest=total-price;
+let budget=650;
+let withinBudget=monthly<=budget;
+let html=`<div class="calc-grid">
+<div class="calc-stat"><div class="val" style="color:${withinBudget?'var(--accent2)':'var(--danger)'}">€${monthly.toFixed(0)}</div><div class="lbl">Monthly Payment</div></div>
+<div class="calc-stat"><div class="val">€${loan.toLocaleString()}</div><div class="lbl">Amount Financed</div></div>
+<div class="calc-stat"><div class="val">€${interest.toFixed(0)}</div><div class="lbl">Total Interest</div></div>
+<div class="calc-stat"><div class="val">€${total.toFixed(0)}</div><div class="lbl">Total Cost</div></div>
+</div>
+<div class="highlight ${withinBudget?'highlight-green':'highlight-red'}" style="margin-top:12px">
+<strong>${withinBudget?'✅':'⚠️'} ${withinBudget?`Within your €${budget}/month budget (€${(budget-monthly).toFixed(0)} headroom)`:`Exceeds €${budget}/month budget by €${(monthly-budget).toFixed(0)}`}</strong></div>`;
+document.getElementById('finance-results').innerHTML=html;
+
+// Budget analysis
+let baHtml='<div class="card-grid">';
+let budgetScenarios=[
+{deposit:5000,apr:7.5,term:48,label:'€5k deposit / 7.5% / 48mo'},
+{deposit:5000,apr:7.5,term:60,label:'€5k deposit / 7.5% / 60mo'},
+{deposit:8000,apr:7.5,term:48,label:'€8k deposit / 7.5% / 48mo'},
+{deposit:5000,apr:5.9,term:48,label:'€5k deposit / 5.9% / 48mo'}
+];
+budgetScenarios.forEach(s=>{
+let l=price-s.deposit,r=s.apr/100/12,m=r>0?(l*r*Math.pow(1+r,s.term))/(Math.pow(1+r,s.term)-1):l/s.term;
+baHtml+=`<div class="calc-stat"><div class="val" style="color:${m<=budget?'var(--accent2)':'var(--danger)'}">€${m.toFixed(0)}/mo</div><div class="lbl">${s.label}</div></div>`;
+});
+baHtml+='</div>';
+document.getElementById('budget-analysis').innerHTML=baHtml;
+}
+
+const TCO_DATA={
+sportage:{fuelL100:7.4,insurance:1100,service:350,tax:285},
+tucson:{fuelL100:7.4,insurance:1100,service:350,tax:285},
+corollacross:{fuelL100:6.8,insurance:1000,service:300,tax:220},
+chr:{fuelL100:7.0,insurance:1000,service:300,tax:220},
+qashqai:{fuelL100:8.0,insurance:1050,service:320,tax:260},
+kona:{fuelL100:7.0,insurance:950,service:280,tax:220},
+rav4:{fuelL100:7.5,insurance:1150,service:300,tax:285}
+};
+
+function updateTCO() {
+let modelId=document.getElementById('tco-model').value;
+let price=parseFloat(document.getElementById('tco-price').value)||27000;
+let yearlyKm=parseInt(document.getElementById('tco-mileage').value)||15000;
+let fuelPrice=parseFloat(document.getElementById('tco-fuel').value)||1.72;
+let d=TCO_DATA[modelId];
+let years=3;
+let totalKm=yearlyKm*years;
+let fuelCost=(totalKm/100)*d.fuelL100*fuelPrice;
+let insurance=d.insurance*years;
+let service=d.service*years;
+let tax=d.tax*years;
+let depreciation=price*(1-(d.depreciation3||45)/100);
+let total=fuelCost+insurance+service+tax+depreciation;
+let html=`<div class="calc-grid">
+<div class="calc-stat"><div class="val">€${total.toFixed(0)}</div><div class="lbl">Total 3-Year Cost</div></div>
+<div class="calc-stat"><div class="val">€${depreciation.toFixed(0)}</div><div class="lbl">Depreciation (${Math.round((1-(d.depreciation3||45)/100)*100)}%)</div></div>
+<div class="calc-stat"><div class="val">€${fuelCost.toFixed(0)}</div><div class="lbl">Fuel (€${fuelPrice}/L)</div></div>
+<div class="calc-stat"><div class="val">€${insurance.toFixed(0)}</div><div class="lbl">Insurance (3yr)</div></div>
+<div class="calc-stat"><div class="val">€${service.toFixed(0)}</div><div class="lbl">Service (3yr)</div></div>
+<div class="calc-stat"><div class="val">€${tax.toFixed(0)}</div><div class="lbl">Motor Tax (3yr)</div></div>
+</div>`;
+document.getElementById('tco-results').innerHTML=html;
+renderTCOComparison(price,yearlyKm,fuelPrice);
+}
+
+function renderTCOComparison(buyPrice,yearlyKm,fuelPrice) {
+let years=3,totalKm=yearlyKm*years;
+let rows=[];
+for(let id in TCO_DATA){
+let d=TCO_DATA[id];
+let fuel=(totalKm/100)*d.fuelL100*fuelPrice;
+let ins=d.insurance*years,svc=d.service*years,tx=d.tax*years;
+let dep=buyPrice*(1-(d.depreciation3||45)/100);
+let total=fuel+ins+svc+tx+dep;
+let m=MODELS.find(x=>x.id===id);
+rows.push({name:m?m.name:id,total,id});
+}
+rows.sort((a,b)=>a.total-b.total);
+let html='<div class="calc-grid">';
+rows.forEach((r,i)=>{
+html+=`<div class="calc-stat"><div class="val" style="color:${i===0?'var(--accent2)':'var(--text)'}">€${r.total.toFixed(0)}</div><div class="lbl">${r.name} #${i+1}</div></div>`;
+});
+html+='</div>';
+document.getElementById('tco-comparison').innerHTML=html;
+}
+
+// Init
+renderScoreTable();
+renderListings();
+calcFinance();
+updateTCO();
+</script>
+</body>
+</html>
